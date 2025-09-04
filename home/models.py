@@ -6,25 +6,8 @@ from asgiref.sync import async_to_sync
 
 # Create your models here.
 
-class Notification(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-    notification = models.TextField(max_length=110)
-    is_seen = models.BooleanField(default=False)
-
-    def save(self,*args,**kwargs):
-        print("savecalled")
-        channel_layer = get_channel_layer()
-        notification_obj = Notification.objects.filter(is_seen = False).count()
-        data = {'count':notification_obj,'curr':self.notification}
-        
-        async_to_sync(channel_layer.group_send)(
-            'test_consumer_group',{
-                'type':'send_notification',
-                'value':data
-            }
-        )
-
-        super(Notification,self).save(*args,**kwargs)
-
-
-
+class Game(models.Model):
+    room_code = models.CharField(max_length=100)
+    game_creator = models.CharField(max_length=100)
+    game_opponent = models.CharField(max_length=100 , blank=True , null=True)
+    is_over = models.BooleanField(default=False) 
